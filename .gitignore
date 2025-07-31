@@ -1,0 +1,9 @@
+__pycache__/
+.ipynb_checkpoints/
+*.pyc
+*.pkl
+*.csv
+*.log
+*.env
+*.DS_Store
+modelo_chatbot/
