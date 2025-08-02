@@ -77,3 +77,28 @@ Este proyecto permite cargar un archivo PDF y hacerle preguntas directamente, co
 - No memoriza interacciones anteriores (no tiene estado de conversación).
 - No detecta automáticamente si inventó una respuesta (eso depende del usuario).
 - No funciona bien con PDFs escaneados o imágenes.
+
+##  Pruebas
+
+Este proyecto incluye un archivo adicional de pruebas automatizadas para evaluar la calidad de las respuestas del chatbot.
+
+### ¿Qué evalúan las pruebas?
+- Precisión de las respuestas: Se compara la respuesta generada con una respuesta esperada.
+- Capacidad de recuperación: Verifica si el chatbot encuentra la información relevante en el PDF.
+- Resistencia al alucinamiento: Evalúa si el modelo evita inventar contenido cuando la respuesta no está en el PDF.
+
+### ¿Cómo se hacen?
+- Se utiliza un PDF base fijo para todas las pruebas.
+- Un archivo CSV contiene varias preguntas, junto con las respuestas esperadas.
+- Se ejecuta automáticamente una comparación entre:
+   - Pregunta
+   - Respuesta esperada
+   - Respuesta obtenida por el chatbot
+   - Se genera un nuevo archivo CSV con los resultados y una columna de precisión estimada.
+
+### ¿Dónde están las pruebas?
+Las pruebas están en el archivo:
+- 📄 pruebas_chatbot_vector_pdf.ipynb
+
+Podés abrirlo en Google Colab, cargar tu propio PDF y CSV de preguntas, y ejecutar el análisis automático para ver cómo responde el modelo frente a preguntas conocidas.
+
