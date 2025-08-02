@@ -78,6 +78,8 @@ Este proyecto permite cargar un archivo PDF y hacerle preguntas directamente, co
 - No detecta automáticamente si inventó una respuesta (eso depende del usuario).
 - No funciona bien con PDFs escaneados o imágenes.
 
+---
+
 ##  Pruebas
 
 Este proyecto incluye un archivo adicional de pruebas automatizadas para evaluar la calidad de las respuestas del chatbot.
@@ -102,3 +104,27 @@ Las pruebas están en el archivo:
 
 Podés abrirlo en Google Colab, cargar tu propio PDF y CSV de preguntas, y ejecutar el análisis automático para ver cómo responde el modelo frente a preguntas conocidas.
 
+---
+
+##  Análisis de las pruebas
+Para facilitar la interpretación de los resultados obtenidos en las pruebas automatizadas, se incluye un segundo notebook dedicado exclusivamente al análisis visual de los datos.
+
+### ¿Qué hace el análisis?
+El archivo analisis_pruebas_chatbot_vector_pdf.ipynb toma como entrada el archivo CSV generado tras las pruebas (con las columnas tipo_pregunta, pregunta, respuesta_esperada, respuesta_obtenida, precision, observaciones) y realiza lo siguiente:
+- Distribución de puntajes: Muestra cómo se comportó el modelo globalmente (desde respuestas incorrectas hasta totalmente correctas).
+- Porcentaje de aciertos: Compara el rendimiento según tipo de pregunta (simple, compleja, fuera de dominio).
+- Análisis desglosado por tipo: Evalúa los puntajes obtenidos en cada categoría de pregunta.
+- Errores frecuentes: Detecta patrones de fallos comunes (respuestas genéricas, confusiones, omisiones).
+- Matriz de confusión: Compara precisión esperada vs. precisión obtenida para visualizar los desvíos más frecuentes.
+
+### ¿Para qué sirve?
+- Identificar fortalezas y debilidades del modelo.
+- Evaluar la consistencia de las respuestas.
+- Guiar ajustes futuros en el índice, el modelo o los parámetros de recuperación.
+- Facilitar la validación manual gracias a los gráficos generados automáticamente.
+
+### ¿Dónde está el análisis?
+El análisis se realiza desde el archivo:
+- 📄 analisis_pruebas_chatbot_vector_pdf.ipynb
+
+Podés cargar cualquier CSV de resultados generado por el sistema de pruebas y visualizar automáticamente los gráficos para obtener un diagnóstico más claro del desempeño del chatbot.
