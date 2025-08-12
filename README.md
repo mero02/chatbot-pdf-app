@@ -9,9 +9,10 @@ Este proyecto permite cargar un archivo PDF y hacerle preguntas directamente, co
 
 - Cargar cualquier PDF con contenido técnico o teórico (ej: resúmenes, apuntes).
 - Hacerle preguntas en lenguaje natural.
-- Responder con base en el contenido del PDF.
-- Si no tiene la respuesta en el PDF, intenta no inventar (se puede ajustar).
+- Responder con base en el contenido del PDF usando búsqueda semántica y un modelo generador.
+- Si no tiene la respuesta en el PDF, intenta no inventar (configurable).
 - Funciona con modelos ligeros como TinyLlama.
+- Permite ejecutar pruebas masivas cargando un CSV con preguntas y respuestas esperadas para evaluar precisión.
 
 ---
 
@@ -30,17 +31,25 @@ Este proyecto permite cargar un archivo PDF y hacerle preguntas directamente, co
    Se extrae el contenido del archivo, se segmenta y se filtran fragmentos útiles (mínimo 20 palabras por bloque).
 
 2. **Vectorización**  
-   Se generan representaciones numéricas de los fragmentos usando `all-MiniLM-L6-v2` (modelo de embeddings).
+   Se generan representaciones numéricas de los fragmentos usando paraphrase-multilingual-mpnet-base-v2 (modelo de embeddings).
 
 3. **Indexación FAISS**  
    Se crea una base de datos de vectores para búsqueda rápida y eficiente.
 
-4. **Interfaz Gradio**  
+4. **Generación de respuestas**
+   Los fragmentos más relevantes se envían como contexto a un modelo de lenguaje (TinyLlama por defecto), que redacta la respuesta final.
+
+5. **Interfaz Gradio**  
    Se despliega una app donde:
    - Cargás el PDF.
    - Escribís una pregunta.
    - Elegís cuántos fragmentos relevantes buscar.
    - El modelo responde basándose en esos fragmentos.
+
+6. **Modo de pruebas masivas (opcional)**
+   - Cargá un PDF como siempre.
+   - Usá el script de evaluación para leer un CSV con preguntas y respuestas esperadas.
+   - Obtendrás un nuevo CSV con las respuestas generadas, puntuaciones de similitud y métricas de precisión.
 
 ---
 
@@ -56,19 +65,22 @@ Este proyecto permite cargar un archivo PDF y hacerle preguntas directamente, co
 
 ##  Personalizaciones posibles
 
-- Cambiar el modelo de lenguaje (`TinyLlama`) por otro más grande si tenés recursos.
-- Ajustar la cantidad de fragmentos que se usan como contexto (`top_k`).
+- Cambiar el modelo de lenguaje (TinyLlama) por otro más grande si tenés recursos.
+- Ajustar la cantidad de fragmentos que se usan como contexto (TOP_K).
+- Ajustar el umbral de similitud (SIMILARITY_THRESHOLD) para ser más estricto o más permisivo.
 - Agregar botones para guardar el índice, respuestas, o historial.
 - Incorporar memoria conversacional si querés extenderlo.
+- Automatizar más métricas de evaluación en el modo CSV.
 
 ---
 
 ##  Observaciones técnicas
 
-- Los embeddings son precomputados solo una vez por PDF.
+- Los embeddings se calculan solo una vez por PDF.
 - El modelo solo responde en base a lo que se recupera (no está entrenado).
-- Si no hay información en el PDF, puede dar una respuesta genérica o indicar que no sabe.
+- Si no hay información relevante, puede dar una respuesta genérica o indicar que no sabe.
 - Todo se mantiene en RAM durante la sesión del Colab.
+- El modo de pruebas CSV permite estudiar el comportamiento del sistema de forma controlada y reproducible.
 
 ---
 
@@ -82,27 +94,41 @@ Este proyecto permite cargar un archivo PDF y hacerle preguntas directamente, co
 
 ##  Pruebas
 
-Este proyecto incluye un archivo adicional de pruebas automatizadas para evaluar la calidad de las respuestas del chatbot.
+El sistema ahora incluye la ejecución de pruebas automatizadas dentro del mismo archivo principal que carga el PDF y responde preguntas. Esto permite:
+- Probar el chatbot de forma masiva con un conjunto de preguntas definidas en un CSV.
+- Comparar cada respuesta obtenida con la respuesta esperada.
+- Guardar automáticamente los resultados en un nuevo CSV, con la columna precision estimada y espacio para observaciones.
 
-### ¿Qué evalúan las pruebas?
-- Precisión de las respuestas: Se compara la respuesta generada con una respuesta esperada.
-- Capacidad de recuperación: Verifica si el chatbot encuentra la información relevante en el PDF.
-- Resistencia al alucinamiento: Evalúa si el modelo evita inventar contenido cuando la respuesta no está en el PDF.
-
-### ¿Cómo se hacen?
-- Se utiliza un PDF base fijo para todas las pruebas.
-- Un archivo CSV contiene varias preguntas, junto con las respuestas esperadas.
-- Se ejecuta automáticamente una comparación entre:
+### ¿Cómo funciona?
+- Se carga un PDF base (igual que en el modo normal).
+- Se carga un CSV con las pruebas (columnas: tipo_pregunta, pregunta, respuesta_esperada).
+- El sistema ejecuta todas las preguntas, guarda la respuesta generada y calcula una precisión inicial.
+- Se genera un CSV de resultados con:
+   - Tipo de pregunta
    - Pregunta
    - Respuesta esperada
-   - Respuesta obtenida por el chatbot
-   - Se genera un nuevo archivo CSV con los resultados y una columna de precisión estimada.
+   - Respuesta obtenida
+   - Puntaje estimado
+   - Observaciones (vacías inicialmente, para revisión manual)
 
-### ¿Dónde están las pruebas?
-Las pruebas están en el archivo:
-- 📄 pruebas_chatbot_vector_pdf.ipynb
+- 📄 Archivo de ejecución: incluido en el notebook principal.
 
-Podés abrirlo en Google Colab, cargar tu propio PDF y CSV de preguntas, y ejecutar el análisis automático para ver cómo responde el modelo frente a preguntas conocidas.
+---
+
+## Revisión manual de pruebas
+Para mejorar la evaluación, se incluye un segundo notebook:
+- 📄 revision_pruebas_chatbot_vector_pdf.ipynb
+
+### ¿Qué hace?
+- Carga el CSV de resultados generado por las pruebas.
+- Permite revisar cada respuesta de forma manual.
+- Asignar una puntuación ajustada según el criterio del evaluador.
+- Guardar un nuevo CSV con las puntuaciones corregidas.
+
+### ¿Para qué sirve?
+- Corregir casos donde la precisión automática no refleja la calidad real.
+- Documentar observaciones detalladas de errores o aciertos.
+- Hacer un análisis más profundo antes de pasar al análisis gráfico.
 
 ---
 
